@@ -19,7 +19,7 @@ export default function dataModuleFunc(state = initialState, action) {
             
             return {
                 ...state,
-                messages: [ ... prevMessages,  ...newMessages]
+                messages: [ ...prevMessages,  ...newMessages]
             }
 
         default:
