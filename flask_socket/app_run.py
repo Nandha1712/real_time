@@ -1,10 +1,9 @@
 import uuid
 from flask_socketio import SocketIO, emit
 from flask import Flask, session, request
-import logging
+from log_utils import create_logger
 
-logger = logging.getLogger("app_log")
-logger.setLevel(logging.INFO)
+logger = create_logger()
 
 app = Flask(__name__)
 
@@ -17,6 +16,7 @@ socketio = SocketIO(cors_allowed_origins=ORIGINS, engineio_logger=True, logger=T
 @socketio.on('connect')
 def events_connect():
     logger.error(f"Connected....{request.sid}")
+    logger.error(f"Request data....{request}, {request.args.get('foo')}, {request.args}")
 
 
 @app.route('/update/<req_id>/<custom_msg>')
@@ -38,6 +38,16 @@ def handle_chat(data):
     """
     emit("chat", data, to=request.sid)
 
+
+@socketio.on('disconnect')
+def socket_disconnect_handler():
+    logger.error(f'Client disconnected...{request.sid}')
+
+
+@socketio.on_error()        # Handles the default namespace
+def error_handler(e):
+    logger.error(f'Socket error...{e}')
+    logger.error(f'Request SID of error...{request.sid}')
 
 
 # initialize the app with the socket instance

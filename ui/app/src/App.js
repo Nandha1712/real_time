@@ -19,7 +19,7 @@ const App = (props) => {
     // open socket connection
     // create websocket
     console.log("Inside use_effect");
-    socket = io("http://127.0.0.1:5000");
+    socket = io("http://127.0.0.1:5000", { query: "foo=bar" });
 
     socket.on("chat", (chat) => {
       console.log("REceieved results: ....");

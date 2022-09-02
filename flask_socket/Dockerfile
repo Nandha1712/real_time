@@ -9,6 +9,7 @@ ADD ./requirements.txt /qualdo/requirements.txt
 WORKDIR /qualdo
 RUN pip install -r /qualdo/requirements.txt
 ADD ./app_run.py /qualdo/app_run.py
+ADD ./log_utils.py /qualdo/log_utils.py
 ENV HOME /qualdo
 EXPOSE 5000
 CMD ["gunicorn", "-b", "0.0.0.0:5000", "app_run:app", "--workers", "1", "--worker-class", "eventlet", "--reload", "--threads", "25", "--timeout", "660"]
