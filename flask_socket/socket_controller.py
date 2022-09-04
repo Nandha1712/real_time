@@ -5,8 +5,6 @@ from log_utils import create_logger
 
 logger = create_logger()
 
-app = Flask(__name__)
-
 ORIGINS = "*"
 
 # initialize your socket instance
@@ -19,12 +17,6 @@ def events_connect():
     logger.error(f"Request data....{request}, {request.args.get('foo')}, {request.args}")
 
 
-@app.route('/update/<req_id>/<custom_msg>')
-def post_custom_msg(req_id, custom_msg):
-    logger.error(f"Incoming Req id: {req_id}, Msg: {custom_msg}")
-    n_msg = {"user": "New", "msg": custom_msg}
-    socketio.emit("chat", n_msg, to=req_id)
-    return "Data pushed"
 
 # handle chat messages
 @socketio.on("chat")
@@ -48,13 +40,3 @@ def socket_disconnect_handler():
 def error_handler(e):
     logger.error(f'Socket error...{e}')
     logger.error(f'Request SID of error...{request.sid}')
-
-
-# initialize the app with the socket instance
-# you could include this line right after Migrate(app, db)
-socketio.init_app(app)
-
-# at the bottom of the file, use this to run the app
-if __name__ == '__main__':
-    app.run(debug=True)
-
