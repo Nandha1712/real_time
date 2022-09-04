@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+
 import {connect} from "react-redux";
 import { io } from 'socket.io-client';
 import {addMetaData} from './redux/actions';
@@ -19,7 +19,11 @@ const App = (props) => {
     // open socket connection
     // create websocket
     console.log("Inside use_effect");
-    socket = io("ws://127.0.0.1:5000", { query: "foo=bar" });
+    let user_id = localStorage.getItem("user_id");
+    if (user_id === undefined || user_id === null) {
+      user_id = 2;
+    }
+    socket = io("ws://127.0.0.1:5000", { query: `user_id=${user_id}` });
 
     socket.on("chat", (chat) => {
       console.log("REceieved results: ....");

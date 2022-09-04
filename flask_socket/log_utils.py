@@ -15,6 +15,19 @@ LOG_FILE_NAME = str(datetime.now()).replace('-', '').replace(':', '').replace(' 
 
 def create_logger(app_name="app_log"):
     logger = logging.getLogger(app_name)
+
+    # If the logger has handlers, it means that logger is already created
+    has_local_logger = False
+    if len(logger.handlers) > 0:
+        for lh in logger.handlers:
+            handler_type = str(type(lh))
+            if "StreamHandler" in handler_type or "FileHandler" in handler_type:
+                has_local_logger = True
+
+    if has_local_logger:
+        return logger
+
+
     LOGGING_LEVEL=logging.INFO
     logger.setLevel(LOGGING_LEVEL)
 

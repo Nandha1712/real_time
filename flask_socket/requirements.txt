@@ -1,4 +1,5 @@
 Flask-SocketIO==5.3.0
 gunicorn==20.1.0
 eventlet==0.30.2
-gevent-websocket==0.10.1
+gevent-websocket
+Flask-Session==0.4.0

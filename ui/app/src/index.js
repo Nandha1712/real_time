@@ -4,10 +4,10 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
-import { persistStore } from 'redux-persist';
+
 import store from "./redux/store";
 
-let persistor = persistStore(store);
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

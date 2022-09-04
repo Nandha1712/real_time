@@ -2,6 +2,7 @@ import uuid
 from flask_socketio import SocketIO, emit
 from flask import Flask, session, request
 from log_utils import create_logger
+import json
 
 logger = create_logger()
 
@@ -13,8 +14,25 @@ socketio = SocketIO(cors_allowed_origins=ORIGINS, engineio_logger=True, logger=T
 
 @socketio.on('connect')
 def events_connect():
-    logger.error(f"Connected....{request.sid}")
-    logger.error(f"Request data....{request}, {request.args.get('foo')}, {request.args}")
+    req_sid = request.sid
+    logger.error(f"Connected....{req_sid}")
+
+    user_id = str(request.args.get('user_id'))
+
+    userdata = session.get(user_id)
+    if userdata is None:
+        session[user_id] = req_sid
+        logger.error(f"Setting userdata....{req_sid}, {user_id}")
+
+    data = None
+    with open('res_dict.json', 'r') as f:
+        data = json.load(f)
+    
+    data[user_id] = req_sid
+    with open('res_dict.json', 'w') as json_file:
+        json.dump(data, json_file)
+
+    logger.error(f"Request data....{request}, {user_id}")
 
 
 
