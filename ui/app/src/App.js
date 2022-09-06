@@ -13,6 +13,7 @@ const App = (props) => {
   // console.log(ru_user);
   const user = { username: "Nandha" };
   
+  let addMetadataFunc = props.addMetaData;
   let messages = props.dataModule.messages;
   console.log(messages);
   useEffect(() => {
@@ -27,7 +28,7 @@ const App = (props) => {
 
     socket.on("chat", (chat) => {
       console.log("REceieved results: ....");
-      props.addMetaData(chat)
+      addMetadataFunc(chat)
       // setMessages(messages => [...messages, chat])
     })
 
@@ -35,7 +36,7 @@ const App = (props) => {
     return (() => {
       socket.disconnect()
     })
-  }, [])
+  }, [addMetadataFunc])
 
   const updateChatInput = (e) => {
     setChatInput(e.target.value)

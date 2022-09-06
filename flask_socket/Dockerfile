@@ -10,8 +10,8 @@ WORKDIR /qualdo
 RUN pip install -r /qualdo/requirements.txt
 ADD ./app_runner.py /qualdo/app_runner.py
 ADD ./api_controller.py /qualdo/api_controller.py
+ADD ./cache.py /qualdo/cache.py
 ADD ./socket_controller.py /qualdo/socket_controller.py
-ADD ./res_dict.json /qualdo/res_dict.json
 ADD ./log_utils.py /qualdo/log_utils.py
 ENV HOME /qualdo
 EXPOSE 5000

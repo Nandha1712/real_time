@@ -3,6 +3,8 @@ from log_utils import create_logger
 from api_controller import ws_api
 from socket_controller import socketio
 from flask_session import Session
+from cache import cache_app
+
 
 logger = create_logger()
 
@@ -13,6 +15,9 @@ session_app = Session()
 # initialize the app with the socket instance
 # you could include this line right after Migrate(app, db)
 socketio.init_app(app)
+
+
+cache_app.init_app(app)
 
 session_app.init_app(app)
 

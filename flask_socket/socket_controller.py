@@ -1,8 +1,11 @@
+from operator import le
 import uuid
 from flask_socketio import SocketIO, emit
 from flask import Flask, session, request
 from log_utils import create_logger
 import json
+import os
+from cache import get_cache_value, set_cached_item, delete_cached_item
 
 logger = create_logger()
 
@@ -15,32 +18,27 @@ socketio = SocketIO(cors_allowed_origins=ORIGINS, engineio_logger=True, logger=T
 @socketio.on('connect')
 def events_connect():
     req_sid = request.sid
-    logger.error(f"Connected....{req_sid}")
+    current_process_id = os.getpid()
+    logger.error(f"PID: {current_process_id} Socket Connected....{req_sid}")
 
     user_id = str(request.args.get('user_id'))
-
-    userdata = session.get(user_id)
-    if userdata is None:
-        session[user_id] = req_sid
-        logger.error(f"Setting userdata....{req_sid}, {user_id}")
-
-    data = None
-    with open('res_dict.json', 'r') as f:
-        data = json.load(f)
+    user_data = get_cache_value(user_id)
+    if user_data is None:
+        user_data = []
     
-    data[user_id] = req_sid
-    with open('res_dict.json', 'w') as json_file:
-        json.dump(data, json_file)
+    user_data.append(req_sid)
 
-    logger.error(f"Request data....{request}, {user_id}")
+    set_cached_item(str(user_id), user_data)
+    set_cached_item(req_sid, f"{user_id}")
+
+    logger.error(f"PID:{current_process_id} Request data. {request}, User: {user_id}, {req_sid}")
 
 
 
 # handle chat messages
 @socketio.on("chat")
 def handle_chat(data):
-    logger.error(f"Incoming data...{data}")
-    logger.error(f"inside chat....{request.sid}")
+    logger.error(f"PID: {os.getpid()} inside chat....{request.sid}")
     """Char func
 
     Args:
@@ -51,10 +49,27 @@ def handle_chat(data):
 
 @socketio.on('disconnect')
 def socket_disconnect_handler():
-    logger.error(f'Client disconnected...{request.sid}')
+    current_process_id = os.getpid()
+    req_sid = request.sid
+
+    user_id_key = get_cache_value(req_sid)
+    delete_cached_item(req_sid)
+    
+    if user_id_key is None:
+        return
+
+    user_data = get_cache_value(user_id_key)
+    if user_data is None or req_sid not in user_data:
+        return
+    
+    user_data.remove(req_sid)
+
+    set_cached_item(user_id_key, user_data)
+    
+    logger.error(f'PID: {current_process_id} Client disconnected...{req_sid}')
 
 
 @socketio.on_error()        # Handles the default namespace
 def error_handler(e):
-    logger.error(f'Socket error...{e}')
-    logger.error(f'Request SID of error...{request.sid}')
+    logger.error(f'PID: {os.getpid()} Request SID of error...{request.sid} Socket error...{e} ')
+
